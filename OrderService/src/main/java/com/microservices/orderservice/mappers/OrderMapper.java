@@ -8,6 +8,7 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface OrderMapper {
+
     OrderMapper INSTANCE = Mappers.getMapper(OrderMapper.class);
 
     @Mapping(target = "orderStatus", constant = "CREATED")
