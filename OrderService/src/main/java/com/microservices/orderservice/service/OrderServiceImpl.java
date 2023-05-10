@@ -4,12 +4,15 @@ import com.microservices.orderservice.entity.Order;
 import com.microservices.orderservice.exeption.OrderServiceCustomException;
 import com.microservices.orderservice.mappers.OrderMapper;
 import com.microservices.orderservice.model.OrderRequest;
+import com.microservices.orderservice.model.PaymentRequest;
 import com.microservices.orderservice.repository.OrderRepository;
 import com.microservices.orderservice.response.ErrorResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -27,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Placing order request {}.", orderRequest);
 
+        log.info("Calling product service to reduce quantity.");
         webClient.put()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("http")
@@ -50,6 +54,33 @@ public class OrderServiceImpl implements OrderService {
         Order order = OrderMapper.INSTANCE.orderRequestToOrder(orderRequest);
 
         Order savedOrder = orderRepository.save(order);
+
+        log.info("Calling payment service to complete the payment.");
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .orderId(order.getId())
+                .paymentMode(orderRequest.getPaymentMode())
+                .amount(orderRequest.getAmount())
+                .build();
+
+        webClient.post()
+                .uri("http://localhost:8083/payment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(paymentRequest))
+                .retrieve()
+                //TODO: handle exception and rollback for the reduce quantity. If the payment fails the quantity will return to the old quantity.
+                /*.onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
+                        .flatMap(errorBody -> Mono.error(new OrderServiceCustomException(
+                                errorBody.getErrorMessage(),
+                                errorBody.getErrorCode(),
+                                clientResponse.statusCode().value()
+                        ))))*/
+                .toBodilessEntity()
+                .block();
+
+        log.info("Payment done Successfully. Changing the Oder status to PLACED");
+        order.setOrderStatus("PLACED");
+        orderRepository.save(order);
+
         log.info("Order placed successfully {}.", savedOrder);
         return order;
     }
