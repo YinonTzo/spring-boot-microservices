@@ -1,6 +1,6 @@
-package com.microservices.productservice.exeption;
+package com.microservices.orderservice.exeption;
 
-import com.microservices.productservice.model.ErrorResponse;
+import com.microservices.orderservice.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,14 +10,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-    //TODO: Fix the HttpStatus.NOT_FOUND
-    @ExceptionHandler(ProductServiceCustomException.class)
-    public ResponseEntity<ErrorResponse> handleProductServiceException(ProductServiceCustomException exception) {
+    @ExceptionHandler(OrderServiceCustomException.class)
+    public ResponseEntity<ErrorResponse> handleProductServiceException(OrderServiceCustomException exception) {
         return new ResponseEntity<>(
                 new ErrorResponse().builder()
                 .errorCode(exception.getErrorCode())
                 .errorMessage(exception.getMessage())
                 .build(),
-                HttpStatus.NOT_FOUND);
+                HttpStatus.valueOf(exception.getStatus()));
     }
 }
