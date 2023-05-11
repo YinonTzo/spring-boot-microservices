@@ -3,8 +3,7 @@ package com.microservices.orderservice.service;
 import com.microservices.orderservice.entity.Order;
 import com.microservices.orderservice.exeption.OrderServiceCustomException;
 import com.microservices.orderservice.mappers.OrderMapper;
-import com.microservices.orderservice.model.OrderRequest;
-import com.microservices.orderservice.model.PaymentRequest;
+import com.microservices.orderservice.model.*;
 import com.microservices.orderservice.repository.OrderRepository;
 import com.microservices.orderservice.response.ErrorResponse;
 import lombok.AllArgsConstructor;
@@ -83,5 +82,57 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Order placed successfully {}.", savedOrder);
         return order;
+    }
+
+    @Override
+    public OrderResponse getOrderDetails(long orderId) {
+        log.info("Get order details for order id {}.", orderId);
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderServiceCustomException(
+                        String.format("Order not found for id %s.", orderId),
+                        "NOT_FOUND",
+                        404));
+
+        log.info("Calling to product service to fetch the product for id {}.", order.getProductId());
+        ProductDetails productDetails = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("http")
+                        .host("localhost")
+                        .port(8080)
+                        .path("/product/{id}")
+                        .build(order.getProductId()))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
+                        .flatMap(errorBody -> Mono.error(new OrderServiceCustomException(
+                                errorBody.getErrorMessage(),
+                                errorBody.getErrorCode(),
+                                clientResponse.statusCode().value()
+                        ))))
+                .bodyToMono(ProductDetails.class)
+                .block();
+
+        log.info("Calling to Payment service to fetch the payment for order id {}.", order.getId());
+        PaymentDetails paymentDetails = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("http")
+                        .host("localhost")
+                        .port(8083)
+                        .path("/payment/order/{id}")
+                        .build(order.getId()))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
+                        .flatMap(errorBody -> Mono.error(new OrderServiceCustomException(
+                                errorBody.getErrorMessage(),
+                                errorBody.getErrorCode(),
+                                clientResponse.statusCode().value()
+                        ))))
+                .bodyToMono(PaymentDetails.class)
+                .block();
+
+        OrderResponse orderResponse = OrderMapper.INSTANCE.orderToOrderResponse(order);
+        //TODO: check how to to make the OrderMapper.INSTANCE assign the values.
+        orderResponse.setProductDetails(productDetails);
+        orderResponse.setPaymentDetails(paymentDetails);
+        return orderResponse;
     }
 }
