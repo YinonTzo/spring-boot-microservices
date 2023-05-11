@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+//TODO: check how to implement the web client correctly. Maybe create some caller object.
 @Service
 @AllArgsConstructor
 @Slf4j
