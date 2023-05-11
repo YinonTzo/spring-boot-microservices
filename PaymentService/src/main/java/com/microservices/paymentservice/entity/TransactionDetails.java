@@ -1,5 +1,6 @@
 package com.microservices.paymentservice.entity;
 
+import com.microservices.paymentservice.model.PaymentMode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,8 +25,8 @@ public class TransactionDetails {
     @Column(name = "ORDER_ID")
     private long orderId;
 
-    @Column(name = "PAYMENT_ID")
-    private String paymentMode;
+    @Column(name = "PAYMENT_MODE")
+    private PaymentMode paymentMode;
 
     @Column(name = "REFERENCE_NUMBER")
     private String referenceNumber;
