@@ -1,0 +1,21 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      routes:
+        - id: ORDER-SERVICE
+          uri: http://localhost:8082/
+          predicates:
+            - Path=/order/**
+        - id: PRODUCT-SERVICE
+          uri: http://localhost:8080/
+          predicates:
+            - Path=/product/**
+        - id: PAYMENT-SERVICE
+          uri: http://localhost:8083/
+          predicates:
+            - Path=/payment/**
