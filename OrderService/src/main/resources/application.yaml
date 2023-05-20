@@ -16,6 +16,10 @@ spring:
     name: ORDER_SERVICE
   jackson.serialization.indent_output: true
 
+microservices:
+  product: http://${PRODUCT_SERVICE:localhost}:8080/product
+  payment: http://${PAYMENT_SERVICE:localhost}:8083/payment
+
 management.endpoints.web.exposure.include: '*'
 management.endpoint.health.show-details: always
 management.health.circuitbreakers.enabled: true

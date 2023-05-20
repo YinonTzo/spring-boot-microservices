@@ -7,8 +7,9 @@ import com.microservices.orderservice.model.*;
 import com.microservices.orderservice.repository.OrderRepository;
 import com.microservices.orderservice.response.ErrorResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -17,15 +18,22 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
 
+
 //TODO: check how to implement the web client correctly. Maybe create some caller object.
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
 
     private final WebClient webClient;
+
+    @Value("${microservices.product}")
+    private String productServiceUrl;
+
+    @Value("${microservices.payment}")
+    private String paymentServiceUrl;
 
     @Override
     @CircuitBreaker(name = "product-service", fallbackMethod = "fallback")
@@ -59,8 +67,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void payInPaymentService(PaymentRequest paymentRequest) {
+        log.info(paymentServiceUrl);
         webClient.post()
-                .uri("http://localhost:8083/payment")
+                .uri(paymentServiceUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(paymentRequest))
                 .retrieve()
@@ -76,13 +85,9 @@ public class OrderServiceImpl implements OrderService {
 
     private void reduceQuantityInProductService(OrderRequest orderRequest) {
         webClient.put()
-                .uri(uriBuilder -> uriBuilder
-                        .scheme("http")
-                        .host("localhost")
-                        .port(8080)
-                        .path("/product/reduceQuantity/{id}")
-                        .queryParam("quantity", orderRequest.getQuantity())
-                        .build(orderRequest.getProductId()))
+                .uri(productServiceUrl + "/reduceQuantity/{id}?quantity={quantity}",
+                        orderRequest.getProductId(), orderRequest.getQuantity()
+                )
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
                         .flatMap(errorBody -> Mono.error(new OrderServiceCustomException(
@@ -119,12 +124,7 @@ public class OrderServiceImpl implements OrderService {
 
     private PaymentDetails getPaymentDetails(Order order) {
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .scheme("http")
-                        .host("localhost")
-                        .port(8083)
-                        .path("/payment/order/{id}")
-                        .build(order.getId()))
+                .uri(paymentServiceUrl + "/order/" + order.getId())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
                         .flatMap(errorBody -> Mono.error(new OrderServiceCustomException(
@@ -138,12 +138,7 @@ public class OrderServiceImpl implements OrderService {
 
     private ProductDetails getProductDetails(Order order) {
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .scheme("http")
-                        .host("localhost")
-                        .port(8080)
-                        .path("/product/{id}")
-                        .build(order.getProductId()))
+                .uri(productServiceUrl + "/" + order.getProductId())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> clientResponse.bodyToMono(ErrorResponse.class)
                         .flatMap(errorBody -> Mono.error(new OrderServiceCustomException(

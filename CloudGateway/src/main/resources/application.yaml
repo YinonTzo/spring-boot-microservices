@@ -8,7 +8,7 @@ spring:
     gateway:
       routes:
         - id: ORDER-SERVICE
-          uri: http://localhost:8082/
+          uri: http://${ORDER_SERVICE_URL:localhost}:8082/
           predicates:
             - Path=/order/**
           filters:
@@ -17,7 +17,7 @@ spring:
                 name: ORDER-SERVICE
                 fallbackuri: forward:/orderServiceFallBack
         - id: PRODUCT-SERVICE
-          uri: http://localhost:8080/
+          uri: http://${PRODUCT_SERVICE_URL:localhost}:8080/
           predicates:
             - Path=/product/**
           filters:
@@ -26,7 +26,7 @@ spring:
                 name: PRODUCT-SERVICE
                 fallbackuri: forward:/productServiceFallBack
         - id: PAYMENT-SERVICE
-          uri: http://localhost:8083/
+          uri: http://${PAYMENT_SERVICE_URL:localhost}:8083/
           predicates:
             - Path=/payment/**
           filters:

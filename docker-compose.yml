@@ -1,0 +1,95 @@
+version: '3'
+
+networks:
+  micro-services-network:
+    driver: bridge
+
+services:
+  order-db-postgres:
+    container_name: order-db-postgres
+    image: postgres
+    environment:
+      POSTGRES_DB: orderdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-order:/data/postgres
+    networks:
+      - micro-services-network
+
+  product-db-postgres:
+    container_name: product-db-postgres
+    image: postgres
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-product:/data/postgres
+    networks:
+      - micro-services-network
+
+  payment-db-postgres:
+    container_name: payment-db-postgres
+    image: postgres
+    environment:
+      POSTGRES_DB: paymentdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-payment:/data/postgres
+    networks:
+      - micro-services-network
+
+  order-service:
+    container_name: order-service
+    image: microservices/order-service:0.0.1
+    environment:
+      - DB_HOST=order-db-postgres
+      - PRODUCT_SERVICE=product-service
+      - PAYMENT_SERVICE=payment-service
+    depends_on:
+      - order-db-postgres
+      - product-service
+      - payment-service
+    networks:
+      - micro-services-network
+
+  payment-service:
+    container_name: payment-service
+    image: microservices/payment-service:0.0.1
+    environment:
+      - DB_HOST=payment-db-postgres
+    depends_on:
+      - payment-db-postgres
+    networks:
+      - micro-services-network
+
+  product-service:
+    container_name: product-service
+    image: microservices/product-service:0.0.1
+    environment:
+      - DB_HOST=product-db-postgres
+    depends_on:
+      - product-db-postgres
+    networks:
+      - micro-services-network
+
+  cloud-gateway:
+    container_name: cloud-gateway
+    image: microservices/cloud-gateway:0.0.1
+    ports:
+      - "9090:9090"
+    environment:
+      - ORDER_SERVICE_URL=order-service
+      - PRODUCT_SERVICE_URL=product-service
+      - PAYMENT_SERVICE_URL=payment-service
+    depends_on:
+      - order-service
+      - product-service
+      - payment-service
+    networks:
+      - micro-services-network
