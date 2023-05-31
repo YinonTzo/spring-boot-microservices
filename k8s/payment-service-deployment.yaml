@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service-app
+spec:
+  selector:
+    matchLabels:
+      app: payment-service-app
+  template:
+    metadata:
+      labels:
+        app: payment-service-app
+    spec:
+      containers:
+        - name: product-service-app
+          image: yinontz/payment-service:0.0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8083
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-cm
+                  key: hostname
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service-svc
+spec:
+  selector:
+    app: payment-service-app
+  ports:
+    - port: 80
+      targetPort: 8083

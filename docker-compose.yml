@@ -46,7 +46,7 @@ services:
 
   order-service:
     container_name: order-service
-    image: microservices/order-service:0.0.1
+    image: yinontz/order-service:0.0.1
     environment:
       - DB_HOST=order-db-postgres
       - PRODUCT_SERVICE=product-service
@@ -60,7 +60,7 @@ services:
 
   payment-service:
     container_name: payment-service
-    image: microservices/payment-service:0.0.1
+    image: yinontz/payment-service:0.0.1
     environment:
       - DB_HOST=payment-db-postgres
     depends_on:
@@ -70,7 +70,7 @@ services:
 
   product-service:
     container_name: product-service
-    image: microservices/product-service:0.0.1
+    image: yinontz/product-service:0.0.1
     environment:
       - DB_HOST=product-db-postgres
     depends_on:
@@ -80,7 +80,7 @@ services:
 
   cloud-gateway:
     container_name: cloud-gateway
-    image: microservices/cloud-gateway:0.0.1
+    image: yinontz/cloud-gateway:0.0.1
     ports:
       - "9090:9090"
     environment:

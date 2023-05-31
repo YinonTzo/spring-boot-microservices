@@ -7,6 +7,7 @@ import com.microservices.orderservice.model.*;
 import com.microservices.orderservice.repository.OrderRepository;
 import com.microservices.orderservice.response.ErrorResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,8 +36,14 @@ public class OrderServiceImpl implements OrderService {
     @Value("${microservices.payment}")
     private String paymentServiceUrl;
 
+    @PostConstruct
+    private void printLogs() {
+        log.info("paymentServiceUrl {}", paymentServiceUrl);
+        log.info("productServiceUrl {}", productServiceUrl);
+    }
+
     @Override
-    @CircuitBreaker(name = "product-service", fallbackMethod = "fallback")
+    @CircuitBreaker(name = "order-service", fallbackMethod = "placeOrderFallBack")
     public Order placeOrder(OrderRequest orderRequest) {
         log.info("Placing order request {}.", orderRequest);
 
@@ -67,7 +74,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void payInPaymentService(PaymentRequest paymentRequest) {
-        log.info(paymentServiceUrl);
         webClient.post()
                 .uri(paymentServiceUrl)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -100,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @CircuitBreaker(name = "product-service", fallbackMethod = "fallback")
+    @CircuitBreaker(name = "order-service", fallbackMethod = "getOrderFallBack")
     public OrderResponse getOrderDetails(long orderId) {
         log.info("Get order details for order id {}.", orderId);
         Order order = orderRepository.findById(orderId)
@@ -150,7 +156,17 @@ public class OrderServiceImpl implements OrderService {
                 .block();
     }
 
-    private OrderResponse fallback(long orderId, WebClientRequestException ex) {
+    private Order placeOrderFallBack(OrderRequest orderRequest, WebClientRequestException ex) {
+        log.info(ex.getMessage());
+
+        throw new OrderServiceCustomException(
+                "Some service isn't accessible.",
+                "UNAVAILABLE",
+                500
+        );
+    }
+
+    private OrderResponse getOrderFallBack(long orderId, WebClientRequestException ex) {
         log.info(ex.getMessage());
 
         throw new OrderServiceCustomException(
