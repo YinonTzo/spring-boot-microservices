@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//TODO: add a table name.
 @Entity
+@Table(name = "PRODUCT")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

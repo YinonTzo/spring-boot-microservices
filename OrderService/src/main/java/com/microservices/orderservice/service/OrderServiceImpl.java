@@ -59,7 +59,6 @@ public class OrderServiceImpl implements OrderService {
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .orderId(order.getId())
                 .paymentMode(orderRequest.getPaymentMode())
-                .amount(orderRequest.getAmount())
                 .build();
 
         payInPaymentService(paymentRequest);

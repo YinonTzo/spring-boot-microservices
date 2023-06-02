@@ -17,9 +17,10 @@ public class ProductServiceImpl implements ProductService {
 
     public static final String THERE_IS_NO_PRODUCT = "There is no product with id %s.";
     public static final String PRODUCT_NOT_FOUND = "PRODUCT_NOT_FOUND";
-    public static final String INSUFFICIENT_PRODUCT = "There are %s from product and the wanted quantity is %s.";
+    public static final String INSUFFICIENT_PRODUCT = "There are %s units of the product %s but the wanted amount is %s.";
     public static final String PRODUCT_DOES_NOT_HAVE_SUFFICIENT_QUANTITY = "Product does not have sufficient quantity.";
     public static final String INSUFFICIENT_QUANTITY = "INSUFFICIENT_QUANTITY";
+
     private final ProductRepository productRepository;
 
     @Override
@@ -57,10 +58,8 @@ public class ProductServiceImpl implements ProductService {
                         PRODUCT_NOT_FOUND
                 ));
 
-        if(product.getQuantity() < quantity) {
-            //TODO: Fix the log.
-            //log.info(String.format(INSUFFICIENT_PRODUCT, product.getQuantity(), quantity));
-            log.info(PRODUCT_DOES_NOT_HAVE_SUFFICIENT_QUANTITY);
+        if (product.getQuantity() < quantity) {
+            log.info(String.format(INSUFFICIENT_PRODUCT, product.getQuantity(), product.getProductName(), quantity));
 
             throw new ProductServiceCustomException(
                     PRODUCT_DOES_NOT_HAVE_SUFFICIENT_QUANTITY,

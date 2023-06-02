@@ -6,11 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class PaymentRequest {
+public class ErrorResponse {
 
-    private long orderId;
-    private PaymentMode paymentMode;
+    private String errorMessage;
+    private String errorCode;
 }

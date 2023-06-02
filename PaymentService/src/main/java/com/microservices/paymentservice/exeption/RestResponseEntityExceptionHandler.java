@@ -1,6 +1,6 @@
-package com.microservices.productservice.exeption;
+package com.microservices.paymentservice.exeption;
 
-import com.microservices.productservice.model.ErrorResponse;
+import com.microservices.paymentservice.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,8 +10,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(ProductServiceCustomException.class)
-    public ResponseEntity<ErrorResponse> handleProductServiceException(ProductServiceCustomException exception) {
+    @ExceptionHandler(PaymentServiceCustomException.class)
+    public ResponseEntity<ErrorResponse> handleProductServiceException(PaymentServiceCustomException exception) {
         return new ResponseEntity<>(
                 new ErrorResponse().builder()
                         .errorCode(exception.getErrorCode())

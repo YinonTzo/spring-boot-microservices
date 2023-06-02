@@ -18,5 +18,4 @@ public class PaymentDetails {
     private PaymentMode paymentMode;
     private String paymentStatus;
     private Instant paymentDate;
-    private long amount;
 }

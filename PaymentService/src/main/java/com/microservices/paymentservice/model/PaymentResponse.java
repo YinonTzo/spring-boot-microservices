@@ -18,5 +18,4 @@ public class PaymentResponse {
     private PaymentMode paymentMode;
     private String paymentStatus;
     private Instant paymentDate;
-    private long amount;
 }

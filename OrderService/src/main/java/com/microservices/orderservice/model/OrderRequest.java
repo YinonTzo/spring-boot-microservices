@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 public class OrderRequest {
 
     private long productId;
-    //TODO: check for deleting it.
-    private long amount;
-    private long quantity;
     private PaymentMode paymentMode;
+    private long quantity;
 }

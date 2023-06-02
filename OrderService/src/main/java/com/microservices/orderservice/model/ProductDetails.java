@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//TODO: validation when assigment the order (product id can't be empty).
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

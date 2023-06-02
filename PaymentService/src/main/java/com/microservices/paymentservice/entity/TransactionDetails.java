@@ -28,15 +28,9 @@ public class TransactionDetails {
     @Column(name = "PAYMENT_MODE")
     private PaymentMode paymentMode;
 
-    @Column(name = "REFERENCE_NUMBER")
-    private String referenceNumber;
-
     @Column(name = "PAYMENT_NUMBER")
     private String paymentStatus;
 
     @Column(name = "PAYMENT_DATE")
     private Instant paymentDate;
-
-    @Column(name = "AMOUNT")
-    private long amount;
 }
