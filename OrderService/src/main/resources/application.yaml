@@ -16,10 +16,12 @@ spring:
     name: ORDER_SERVICE
   jackson.serialization.indent_output: true
 
-# microservices:
-#  product: http://${PRODUCT_SERVICE:localhost}:8080/product
-#  payment: http://${PAYMENT_SERVICE:localhost}:8083/payment
+# localhost or docker.
+#microservices:
+  #product: http://${PRODUCT_SERVICE:localhost}:8080/product
+  #payment: http://${PAYMENT_SERVICE:localhost}:8083/payment
 
+# k8s.
 microservices:
   product: http://product-service-svc/product
   payment: http://payment-service-svc/payment
