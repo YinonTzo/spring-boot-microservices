@@ -1,4 +1,4 @@
-package com.microservices.orderservice.exeption;
+package com.microservices.orderservice.exception;
 
 import lombok.Data;
 

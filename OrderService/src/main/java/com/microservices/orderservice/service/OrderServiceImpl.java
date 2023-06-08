@@ -1,7 +1,7 @@
 package com.microservices.orderservice.service;
 
 import com.microservices.orderservice.entity.Order;
-import com.microservices.orderservice.exeption.OrderServiceCustomException;
+import com.microservices.orderservice.exception.OrderServiceCustomException;
 import com.microservices.orderservice.mappers.OrderMapper;
 import com.microservices.orderservice.model.*;
 import com.microservices.orderservice.repository.OrderRepository;

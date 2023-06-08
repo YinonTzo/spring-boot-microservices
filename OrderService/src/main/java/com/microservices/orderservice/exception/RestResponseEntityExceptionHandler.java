@@ -1,4 +1,4 @@
-package com.microservices.orderservice.exeption;
+package com.microservices.orderservice.exception;
 
 import com.microservices.orderservice.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(OrderServiceCustomException.class)
-    public ResponseEntity<ErrorResponse> handleProductServiceException(OrderServiceCustomException exception) {
+    public ResponseEntity<ErrorResponse> handleOrderServiceException(OrderServiceCustomException exception) {
         return new ResponseEntity<>(
                 new ErrorResponse().builder()
                 .errorCode(exception.getErrorCode())
