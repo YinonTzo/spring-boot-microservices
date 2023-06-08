@@ -14,7 +14,7 @@ public interface PaymentMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "paymentStatus", constant = "SUCCESS")
     @Mapping(target = "paymentDate", expression = "java(java.time.Instant.now())")
-    TransactionDetails PaymentRequestToTransactionDetails(PaymentRequest paymentRequest);
+    TransactionDetails paymentRequestToTransactionDetails(PaymentRequest paymentRequest);
 
     PaymentResponse transactionDetailsToPaymentResponse(TransactionDetails transactionDetails);
 }

@@ -24,7 +24,7 @@ public class PaymentServiceImpl implements PaymentService {
     public TransactionDetails doPayment(PaymentRequest paymentRequest) {
         log.info("Recording payment details: {}", paymentRequest);
 
-        TransactionDetails transactionDetails = PaymentMapper.INSTANCE.PaymentRequestToTransactionDetails(paymentRequest);
+        TransactionDetails transactionDetails = PaymentMapper.INSTANCE.paymentRequestToTransactionDetails(paymentRequest);
 
         paymentRepository.save(transactionDetails);
         log.info("Transaction complete with id: {}", transactionDetails.getId());
