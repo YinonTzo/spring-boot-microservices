@@ -48,7 +48,7 @@ You should receive a response with status 201 (Created) and the product details.
 
 Now, let's create an order. Send a **POST** request to the order service: <br>
 <ul>
-<li>The uri: <code>hhttp://localhost:9090/order/placeOrder</code> </li>
+<li>The uri: <code>http://localhost:9090/order/placeOrder</code> </li>
 <li>and the body request (as json):</li>
 <code>
    { </br>
